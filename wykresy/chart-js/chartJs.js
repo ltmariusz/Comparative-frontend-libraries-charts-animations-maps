@@ -25,22 +25,30 @@ var ctx = document.getElementById('chartLine').getContext('2d');
 
 // Tworzymy dane wykresu (możesz dostosować je do własnych potrzeb)
 var data = {
-    labels: ['Red', 'Blue', 'Yellow'],
+    labels: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
     datasets: [{
         data: [10, 20, 15],
-        backgroundColor: ['red', 'blue', 'yellow']
+        backgroundColor: ['red', 'blue', 'yellow'],
     }]
 };
 
 // Konfigurujemy opcje wykresu
 var options = {
     responsive: true,
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
+    scales: {
+        yAxes: [{
+            ticks: {
+                beginAtZero: true // Skala Y zaczyna się od zera
+            }
+        }]
+    }
 };
+
 
 // Tworzymy nowy wykres kołowy
 var chartLine = new Chart(ctx, {
-    type: 'pie',
+    type: 'line',
     data: data,
     options: options
 });
