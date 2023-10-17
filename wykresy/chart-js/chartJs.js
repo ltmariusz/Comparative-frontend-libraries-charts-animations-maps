@@ -13,6 +13,8 @@ var dateFile = './../../dane/date-chart-line.json'
 //100danych
 var dataFile100 = "./../../dane/date-chart-line100.json"
 var dataFile1000 = "./../../dane/date-chart-line1000.json"
+var dataFile10000 = "./../../dane/date-chart-line10000.json"
+var dataFile100000 = "./../../dane/date-chart-line100000.json"
 var exampleData1
 let tableX = [];
 let tableY = [];
@@ -23,7 +25,9 @@ var stepSizeY
 var chartLine 
 // downloadAndCreate(dateFile)
 function downloadAndCreate(file) {
-
+    if (chartLine) {
+        chartLine.destroy();
+    }
     downloadDateFromFile(file)
         .then(function (dane) {
             tableX=[]
@@ -122,5 +126,8 @@ function click1000() {
     downloadAndCreate(dataFile1000)
 }
 function click10000() {
-    downloadAndCreate(dataFile1000)
+    downloadAndCreate(dataFile10000)
+}
+function click100000() {
+    downloadAndCreate(dataFile100000)
 }
