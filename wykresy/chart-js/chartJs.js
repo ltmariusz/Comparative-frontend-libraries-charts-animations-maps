@@ -83,6 +83,9 @@ function createChart() {
 
     // Konfigurujemy opcje wykresu
     var options = {
+        animation: {
+            duration: 0 // Wyłącz animacje, ustawiając czas trwania na 0
+        },
         responsive: true,
         maintainAspectRatio: false,
         scales: {
