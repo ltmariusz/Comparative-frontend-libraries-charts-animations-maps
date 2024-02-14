@@ -1,4 +1,25 @@
-# Projekt Testowania Bibliotek Front-endowych
+# **ENG** Front-end Library Testing Project
+
+## Project Objective
+
+The primary goal of this project was to examine, compare, and evaluate various front-end libraries used for displaying charts, animations, and maps in web applications. The project aimed to identify the most effective and flexible tools that can be utilized in future projects for data visualization and creating interactive user interfaces.
+
+## Project Scope
+
+The project encompassed a series of tasks, including:
+
+- **Library Selection**
+- **Installation and Configuration**
+- **Creating Sample Implementations**
+- **Testing and Evaluation**
+
+## Evaluation
+
+The evaluation of the results took place in the master's thesis.
+
+
+
+# **PL** Projekt Testowania Bibliotek Front-endowych
 
 ## Cel Projektu
 
