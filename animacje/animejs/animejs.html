@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="./anime-master/lib/anime.min.js"></script>
+</head>
+
+<body onload="startAnimeJS()">
+    <div id="animejsBox" style="width: 100px; height: 100px; background: red; position: absolute;"></div>
+
+    <script>
+        var start;
+
+        function startAnimeJS() {
+            start = performance.now();
+
+            anime({
+                targets: '#animejsBox',
+                translateX: 250,
+                duration: 2000,  // Trwa 2 sekundy
+                easing: 'linear',
+                complete: function () {
+                    var end = performance.now();
+                    console.log('Total Time from Page Load to Anime.js Animation End:', end - start, 'ms');
+                    sendDataToPHP(end - start);
+                }
+            });
+        }
+
+        function sendDataToPHP(duration) {
+            fetch('save_data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ time: duration })
+            })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

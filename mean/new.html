@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Oblicz Średnią Arytmetyczną</title>
+</head>
+
+<body>
+    <h1>Oblicz Średnią Arytmetyczną</h1>
+    <textarea id="dataInput" rows="10" cols="50"></textarea><br>
+    <button onclick="calculateAverage()">Oblicz</button>
+    <h2>Średnia Arytmetyczna: <span id="averageOutput"></span></h2>
+    <script>
+        function calculateAverage() {
+            let data = document.getElementById("dataInput").value;
+            try {
+                // Sprawdzanie, czy dane są w formacie JSON
+                if (data.startsWith("[") && data.endsWith("]")) {
+                    data = JSON.parse(data);
+                } else {
+                    // Przetwarzanie danych oddzielonych przecinkami
+                    data = data.split(",").map(Number);
+                }
+
+                let sum = data.reduce((a, b) => a + b, 0);
+                let average = sum / data.length;
+
+                // Używanie lokalizacji 'pl-PL' do zamiany kropki na przecinek
+                document.getElementById("averageOutput").textContent = average.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } catch (e) {
+                alert("Wystąpił błąd: " + e.message);
+            }
+        }
+
+    </script>
+</body>
+
+</html>

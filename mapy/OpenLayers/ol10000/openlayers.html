@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenLayers - Stare Miasto, Poznań</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        #loadTime {
+            margin-top: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="loadTime"></div>
+
+    <script>
+        let startTime = performance.now();
+        let tilesLoaded = 0;
+        let tilesToLoad = 0;
+        let loadTimeSent = false;
+
+        var source = new ol.source.OSM();
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({ source: source })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([16.9252, 52.4064]),
+                zoom: 14
+            })
+        });
+
+        var markers = new ol.layer.Vector({
+            source: new ol.source.Vector(),
+            style: new ol.style.Style({
+                image: new ol.style.Icon({
+                    anchor: [0.5, 1],
+                    src: 'https://openlayers.org/en/latest/examples/data/icon.png'
+                })
+            })
+        });
+
+        map.addLayer(markers);
+
+        for (let i = 0; i < 10000; i++) {
+            var offsetLat = Math.random() * 0.1 - 0.05;
+            var offsetLng = Math.random() * 0.1 - 0.05;
+            var marker = new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.fromLonLat([16.9252 + offsetLng, 52.4064 + offsetLat]))
+            });
+            markers.getSource().addFeature(marker);
+        }
+
+        source.on('tileloadstart', function() {
+            tilesToLoad++;
+        });
+
+        source.on('tileloadend', function() {
+            tilesLoaded++;
+            if (tilesLoaded === tilesToLoad && !loadTimeSent) {
+                let endTime = performance.now();
+                let loadTime = endTime - startTime;
+                document.getElementById('loadTime').innerText = `Czas ładowania: ${loadTime} ms`;
+                sendData(loadTime);
+                loadTimeSent = true;
+            }
+        });
+
+        source.on('tileloaderror', function() {
+            tilesLoaded++;
+            if (tilesLoaded === tilesToLoad && !loadTimeSent) {
+                let endTime = performance.now();
+                let loadTime = endTime - startTime;
+                document.getElementById('loadTime').innerText = `Czas ładowania: ${loadTime} ms`;
+                sendData(loadTime);
+                loadTimeSent = true;
+            }
+        });
+
+        function sendData(loadTime) {
+            fetch('saveLoadTime.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ loadTime: loadTime }),
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

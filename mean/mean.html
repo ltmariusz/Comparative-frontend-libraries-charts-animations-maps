@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obliczanie Średniej</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #inputArea {
+            width: 300px;
+            height: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Obliczanie średniej wartości 'endTime'</h2>
+    <textarea id="inputArea" placeholder='Wprowadź listę obiektów JSON tutaj...'></textarea><br>
+    <button onclick="calculateAverage()">Oblicz średnią</button>
+    <h3>Średnia: <span id="averageResult">-</span></h3>
+
+    <script>
+        function calculateAverage() {
+            const input = document.getElementById('inputArea').value;
+            try {
+                const objects = JSON.parse('[' + input + ']');
+                const sum = objects.reduce((acc, obj) => acc + (obj.endTime || 0), 0);
+                const average = (sum / objects.length) || 0;
+                document.getElementById('averageResult').textContent = average.toFixed(2);
+            } catch (e) {
+                alert('Wystąpił błąd! Upewnij się, że wprowadzone dane są poprawnym formatem JSON.');
+            }
+        } 
+    </script>
+</body>
+
+</html>

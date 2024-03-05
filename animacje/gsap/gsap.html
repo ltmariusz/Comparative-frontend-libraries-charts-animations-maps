@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="./gsap-public/gsap-public/minified/gsap.min.js"></script>
+</head>
+
+<body onload="startGSAP()">
+    <div id="gsapBox" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+
+    <script>
+        var start;
+
+        function startGSAP() {
+            start = performance.now();
+
+            gsap.to("#gsapBox", {
+                duration: 2,  // Trwa 2 sekundy
+                x: 250,
+                ease: "none",
+                onComplete: function () {
+                    var end = performance.now();
+                    console.log('Total Time from Page Load to GSAP Animation End:', end - start, 'ms');
+                    sendDataToPHP(end - start);
+                }
+            });
+        }
+        function sendDataToPHP(duration) {
+            fetch('save_data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ time: duration })
+            })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

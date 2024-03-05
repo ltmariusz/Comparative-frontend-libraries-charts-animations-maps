@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Leaflet - Stare Miasto, Poznań</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        #loadTime {
+            margin-top: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="loadTime"></div>
+
+    <script>
+        let startTime = performance.now();
+
+        var map = L.map('map').setView([52.4064, 16.9252], 14);
+        var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+        for (let i = 0; i < 1; i++) {
+            var offsetLat = Math.random() * 0.1 - 0.05;
+            var offsetLng = Math.random() * 0.1 - 0.05;
+            L.marker([52.4064 + offsetLat, 16.9252 + offsetLng]).addTo(map);
+        }
+        tileLayer.on('load', function () {
+            setTimeout(function () {
+                let endTime = performance.now();
+                let loadTime = endTime - startTime;
+                document.getElementById('loadTime').innerText = `Czas ładowania: ${loadTime} ms`;
+                sendData(loadTime);
+            }, 100)
+        });
+
+        function sendData(loadTime) {
+            fetch('saveLoadTime.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ loadTime: loadTime }),
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

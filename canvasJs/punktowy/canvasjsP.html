@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Wydajności CanvasJS - Wykres Punktowy</title>
+    <script src="canvasjs-chart-3.7.27/canvasjs.min.js"></script>
+</head>
+
+<body>
+
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <button id="btn10">10 punktów</button>
+    <button id="btn100">100 punktów</button>
+    <button id="btn1000">1000 punktów</button>
+    <button id="btn10000">10000 punktów</button>
+    <button id="btn100000">100000 punktów</button>
+
+    <script>
+        function generateData(count) {
+            var dataPoints = [];
+            for (var i = 0; i < count; i++) {
+                dataPoints.push({ x: Math.random() * 100, y: Math.random() * 100 });
+            }
+            return dataPoints;
+        }
+
+        function renderChart(dataPoints, count) {
+            const startTime = performance.now(); // Rozpoczęcie pomiaru czasu
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: false,
+                theme: "light2",
+                title: {
+                    text: "Wykres Punktowy"
+                },
+                axisX: {
+                    title: "Oś X",
+                    includeZero: false
+                },
+                axisY: {
+                    title: "Oś Y",
+                    includeZero: false
+                },
+                data: [{
+                    type: "scatter",
+                    toolTipContent: "<b>X:</b> {x} <br/><b>Y:</b> {y}",
+                    dataPoints: dataPoints
+                }]
+            });
+            chart.render();
+
+            const endTime = performance.now(); // Zakończenie pomiaru czasu
+            console.log(`Czas renderowania wykresu: ${endTime - startTime} ms`);
+            let timee = endTime - startTime
+            fetch('save_data.php', {
+                method: 'POST',
+                body: JSON.stringify({ data: dataPoints, count, timee }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.text())
+                .then(text => { console.log(text); resolve(); window.chartRendered = true; })
+                .catch(error => {
+                    console.error('Błąd:', error);
+                    resolve(); // Rozwiązanie obietnicy nawet w przypadku błędu
+                    window.chartRendered = true;
+                });
+
+
+        }
+
+        document.getElementById('btn10').addEventListener('click', () => renderChart(generateData(10), 10));
+        document.getElementById('btn100').addEventListener('click', () => renderChart(generateData(100), 100));
+        document.getElementById('btn1000').addEventListener('click', () => renderChart(generateData(1000), 1000));
+        document.getElementById('btn10000').addEventListener('click', () => renderChart(generateData(10000), 10000));
+        document.getElementById('btn100000').addEventListener('click', () => renderChart(generateData(100000), 100000));
+    </script>
+
+</body>
+
+</html>

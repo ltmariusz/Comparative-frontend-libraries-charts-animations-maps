@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Wydajności Highcharts</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+
+<body>
+
+    <div id="container" style="width: 100%; height: 400px; margin: 0 auto"></div>
+    <button id="btn10">10 zmiennych</button>
+    <button id="btn100">100 zmiennych</button>
+    <button id="btn1000">1000 zmiennych</button>
+    <button id="btn10000">10000 zmiennych</button>
+    <button id="btn100000">100000 zmiennych</button>
+
+    <script>
+        function generateData(count) {
+            var seriesData = [];
+            for (var i = 0; i < count; i++) {
+                seriesData.push({
+                    x: i,
+                    y1: Math.random() * 100, // Wartość dla pierwszej serii
+                    y2: Math.random() * 100  // Wartość dla drugiej serii
+                });
+            }
+            return seriesData;
+        }
+
+        function transformDataForSeries(data, seriesNumber) {
+            return data.map(item => [item.x, item['y' + seriesNumber]]);
+        }
+
+        function renderChart(data,count) {
+            const startTime = performance.now();
+
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'area', // Zmiana na wykres warstwowy
+                    animation: false, 
+                    events: {
+                        load: function () {
+                            const endTime = performance.now();
+                            let timee = endTime - startTime;
+                            console.log(timee)
+                            fetch('save_data.php', {
+                                method: 'POST',
+                                body: JSON.stringify({ data: data, count, timee }),
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                                .then(response => response.text())
+                                .then(text => console.log(text))
+                                .catch(error => console.error('Błąd:', error));
+                        }
+                    }
+                },
+
+                plotOptions: {
+                    area: {
+                        animation: false // Wyłączenie animacji dla serii typu 'area'
+                    }
+                },
+                title: {
+                    text: 'Wykres warstwowy'
+                },
+                xAxis: {
+                    type: 'linear'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Wartości'
+                    }
+                },
+                series: [
+                    {
+                        name: 'Seria 1',
+                        data: transformDataForSeries(data, 1)
+                    },
+                    {
+                        name: 'Seria 2',
+                        data: transformDataForSeries(data, 2)
+                    }
+                ]
+            });
+
+
+        }
+
+        // document.getElementById('btn10').addEventListener('click', function() {
+        //     const startTime = performance.now(); // Rozpoczęcie pomiaru czasu
+        //     const data = generateData(10);
+        //     renderChart(data);
+        //     console.log(`Czas renderowania wykresu: ${performance.now() - startTime} ms`);
+        // });
+
+        // document.getElementById('btn100').addEventListener('click', function() {
+        //     const startTime = performance.now();
+        //     const data = generateData(100);
+        //     renderChart(data);
+        //     console.log(`Czas renderowania wykresu: ${performance.now() - startTime} ms`);
+        // });
+        // document.getElementById('btn1000').addEventListener('click', function() {
+        //     const startTime = performance.now();
+        //     const data = generateData(1000);
+        //     renderChart(data);
+        //     console.log(`Czas renderowania wykresu: ${performance.now() - startTime} ms`);
+        // });
+        // document.getElementById('btn10000').addEventListener('click', function() {
+        //     const startTime = performance.now();
+        //     const data = generateData(10000);
+        //     renderChart(data);
+        //     console.log(`Czas renderowania wykresu: ${performance.now() - startTime} ms`);
+        // });
+        document.getElementById('btn100000').addEventListener('click', () => renderChart(generateData(100000), 100000));
+
+        document.getElementById('btn10').addEventListener('click', () => renderChart(generateData(10), 10));
+        document.getElementById('btn100').addEventListener('click', () => renderChart(generateData(100), 100));
+        document.getElementById('btn1000').addEventListener('click', () => renderChart(generateData(1000), 1000));
+        document.getElementById('btn10000').addEventListener('click', () => renderChart(generateData(10000), 10000));
+    </script>
+
+</body>
+
+</html>

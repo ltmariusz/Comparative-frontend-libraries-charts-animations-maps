@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="./gsap-public/gsap-public/minified/gsap.min.js"></script>
+</head>
+
+<body onload="startGSAP()">
+    <div id="gsapBox0" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox1" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox2" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox3" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox4" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox5" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox6" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox7" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox8" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+    <div id="gsapBox9" style="width: 100px; height: 100px; background: blue; position: absolute;"></div>
+
+    <script>
+        var start;
+
+        function startGSAP() {
+            start = performance.now();
+            let animations = [];
+
+            for (let i = 0; i <= 10; i++) {
+                let anim = gsap.to(`#gsapBox${i}`, {
+                    duration: 2,
+                    x: 250 + i * 10,
+                    ease: "none",
+                });
+                animations.push(anim);
+            }
+
+            // Czekanie na zakończenie wszystkich animacji
+            Promise.all(animations).then(() => {
+                var end = performance.now();
+                console.log('Total Time:', end - start, 'ms');
+                sendDataToPHP(end - start);
+            });
+        }
+
+        function sendDataToPHP(duration) {
+            fetch('save_data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ time: duration })
+            })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

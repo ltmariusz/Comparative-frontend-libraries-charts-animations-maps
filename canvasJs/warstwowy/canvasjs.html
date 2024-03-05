@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Wydajności CanvasJS</title>
+    <script src="canvasjs-chart-3.7.27/canvasjs.min.js"></script>
+</head>
+
+<body>
+
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <button id="btn10">10 zmiennych</button>
+    <button id="btn100">100 zmiennych</button>
+    <button id="btn1000">1000 zmiennych</button>
+    <button id="btn10000">10000 zmiennych</button>
+    <button id="btn100000">100000 zmiennych</button>
+
+    <script>
+        function generateData(count) {
+            var dataPoints1 = [];
+            var dataPoints2 = [];
+            for (var i = 0; i < count; i++) {
+                dataPoints1.push({ x: i, y: Math.random() * 100 });
+                dataPoints2.push({ x: i, y: Math.random() * 100 });
+            }
+            return [dataPoints1, dataPoints2];
+        }
+
+
+        function renderChart(dataPointsArray , count) {
+            const startTime = performance.now();
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Wykres warstwowy"
+                },
+                toolTip: {
+                    shared: true
+                },
+                data: [
+                    {
+                        type: "stackedArea",
+                        name: "Seria 1",
+                        showInLegend: true,
+                        dataPoints: dataPointsArray[0]
+                    },
+                    {
+                        type: "stackedArea",
+                        name: "Seria 2",
+                        showInLegend: true,
+                        dataPoints: dataPointsArray[1]
+                    }
+                ]
+            });
+            chart.render();
+
+            const endTime = performance.now();
+            console.log(`Czas renderowania wykresu: ${endTime - startTime} ms`);
+            let timee =endTime - startTime
+            fetch('save_data.php', {
+                method: 'POST',
+                body: JSON.stringify({ data: dataPointsArray, count, timee }),
+                 headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.text())
+                .then(text => { console.log(text); resolve(); window.chartRendered = true; })
+                .catch(error => {
+                    console.error('Błąd:', error);
+                    resolve(); // Rozwiązanie obietnicy nawet w przypadku błędu
+                    window.chartRendered = true;
+                });
+
+
+        }
+
+        document.getElementById('btn10').addEventListener('click', () => renderChart(generateData(10), 10));
+        document.getElementById('btn100').addEventListener('click', () => renderChart(generateData(100), 100));
+        document.getElementById('btn1000').addEventListener('click', () => renderChart(generateData(1000), 1000));
+        document.getElementById('btn10000').addEventListener('click', () => renderChart(generateData(10000), 10000));
+        document.getElementById('btn100000').addEventListener('click', () => renderChart(generateData(100000), 100000));
+    </script>
+
+</body>
+
+</html>

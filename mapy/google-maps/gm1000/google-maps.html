@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Google Maps - Stare Miasto, Poznań</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        #loadTime {
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDssoqjSNJhYaKWlb07QN_t6BgkbCmL2ro&callback=initMap"></script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="loadTime"></div>
+
+    <script>
+        let startTime = performance.now();
+
+        function initMap() {
+            var poznan = { lat: 52.4064, lng: 16.9252 };
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 14,
+                center: poznan
+            });
+
+            google.maps.event.addListenerOnce(map, 'tilesloaded', function () {
+                let endTime = performance.now();
+                let loadTime = endTime - startTime;
+                document.getElementById('loadTime').innerText = `Czas ładowania: ${loadTime} ms`;
+                sendData(loadTime);
+            });
+            for (let i = 0; i < 5000; i++) {
+                var offsetLat = Math.random() * 0.1 - 0.05;
+                var offsetLng = Math.random() * 0.1 - 0.05;
+                new google.maps.Marker({
+                    position: { lat: 52.4064 + offsetLat, lng: 16.9252 + offsetLng },
+                    map: map
+                });
+            }
+
+        }
+
+        function sendData(loadTime) {
+            fetch('saveData.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ loadTime: loadTime }),
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+
+</html>
